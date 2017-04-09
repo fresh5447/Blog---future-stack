@@ -13,6 +13,7 @@ import NavBar from './NavBar'
 import About from './About'
 import Posts from './PostsPage'
 import NewPost from './NewPostPage'
+import CreateUser from './CreateUser'
 
 const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_GRAPHQL_ENDPOINT })
 
@@ -21,12 +22,16 @@ const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_GRA
 networkInterface.use([{
   applyMiddleware (req, next) {
     if (!req.options.headers) {
-      // Create the header object if needed.
       req.options.headers = {}
     }
-    req.options.headers['x-graphcool-source'] = 'example:react-apollo-todo'
-    next()
-  },
+
+
+// get the authentication token from local storage if it exists
+if (localStorage.getItem('auth0IdToken')) {
+  req.options.headers.authorization = `Bearer ${localStorage.getItem('auth0IdToken')}`
+}
+next()
+},
 }])
 
 const client = new ApolloClient({ networkInterface })
@@ -42,6 +47,7 @@ ReactDOM.render((
       <Route path="/topics" component={Topics}/>
       <Route path="/posts" component={Posts}/>
       <Route path="/new-post" component={NewPost}/>
+      <Route path='signup' component={CreateUser} />
       </div>
     </Router>
   </ApolloProvider>
